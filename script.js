@@ -1,6 +1,10 @@
 const button = document.getElementById('button');
 const audioElement = document.getElementById('audio');
 
+const jokeApiUrl = 'https://dad-jokes.p.rapidapi.com/random/joke'
+
+const jokeApiKey = "";
+const textSpeechApiKey = '';
 
 // VoiceRSS Javascript SDK
 var VoiceRSS = {
@@ -88,10 +92,10 @@ var VoiceRSS = {
     },
 };
 
-function test() {
+function tellMe(joke) {
     VoiceRSS.speech({
-        key: 'API_KEY',
-        src: 'Hello, world!',
+        key: textSpeechApiKey,
+        src: joke,
         hl: 'en-us',
         v: 'Linda',
         r: 0,
@@ -100,4 +104,30 @@ function test() {
         ssml: false
     });
 }
-test();
+
+async function GetRandomJokes() {
+    let setup = '';
+    let punchline = '';
+    let joke = '';
+
+    try {
+        const response = await fetch(jokeApiUrl, {
+            "method": "GET",
+            "headers": {
+                "x-rapidapi-key": jokeApiKey,
+                "x-rapidapi-host": "dad-jokes.p.rapidapi.com"
+            }
+        });
+        const data = await response.json();
+        if (data.success) {
+            setup = data.body[0].setup;
+            punchline = data.body[0].punchline;
+            joke = `${setup}... ${punchline}`;
+            tellMe(joke);
+        }
+    } catch (error) {
+        console.log('whoops error during getting a joke', error);
+    }
+}
+
+GetRandomJokes();
